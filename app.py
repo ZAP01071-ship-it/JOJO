@@ -65,18 +65,18 @@ def get_dual_images(stand_id, default_img):
         "death_thirteen": ["death13", "death"],
         "dark_blue_moon": ["darkbruemoon", "darkblue", "moon"],
         "ebony_devil": ["ebonydevil", "devil"],
-        "silver_chariots": ["chariot"],
-        "hierophant_green": ["hierophant"],
-        "star_platinum": ["star"],
-        "hermit_purple": ["hermit"],
-        "the_fool": ["fool"],
-        "the_world": ["world"],
-        "judgement": ["judgement"],
-        "high_priestess": ["highpriestess"],
+        "silver_chariots": ["chariot", "silva"],
+        "hierophant_green": ["hierophant", "kakyoin"],
+        "star_platinum": ["star", "ster", "platinam"],
+        "hermit_purple": ["hermit", "harmit", "parple"],
+        "the_fool": ["fool", "iggy"],
+        "the_world": ["world", "warld"],
+        "judgement": ["judgement", "judgment"],
+        "high_priestess": ["highpriestess", "hipriest"],
         "tower_of_gray": ["tower"],
         "lovers": ["lover"],
-        "magicians_red": ["magician"],
-        "wheel_of_fortune": ["wheeloffortune"],
+        "magicians_red": ["magician", "magiciansred"],
+        "wheel_of_fortune": ["wheeloffortune", "wheel"],
         "justice": ["justice"],
         "yellow_temperance": ["temperance"],
         "emperor": ["emperor"],
@@ -122,13 +122,16 @@ def get_dual_images(stand_id, default_img):
         stand_img = png_stands[0]
     elif found_stands:
         stand_img = found_stands[0]
+    elif tarot_img and stand_img == default_img:
+        # スタンド画像がどうしても無い場合、一覧ではタロット面を表示して「歯抜け」を防ぐ
+        stand_img = tarot_img
 
     # アップロード画像 (uploads) は常に最終決定より優先
-    for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+    for ext in [".webp", ".png", ".jpg", ".jpeg"]:
         custom_path = os.path.join(UPLOAD_DIR, f"{stand_id}{ext}")
         if os.path.exists(custom_path):
             stand_img = custom_path
-            break # pngを見つけたら即終了
+            break # 見つけたら即終了
 
     # 特例 (kakyoin.png を優先)
     if stand_id == "hierophant_green":

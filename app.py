@@ -53,9 +53,12 @@ def get_dual_images(stand_id, default_img):
         files = []
     
     def normalize(s):
-        return s.lower().replace(" ", "").replace("_", "").replace("-", "").replace("[", "").replace("]", "")
+        # 拡張子を除いたファイル名を正規化
+        base = os.path.splitext(s)[0]
+        return base.lower().replace(" ", "").replace("_", "").replace("-", "").replace("[", "").replace("]", "")
 
     stand_id_norm = normalize(stand_id)
+    # 名称の揺れに対応 (単数形など) 
     id_words = [normalize(w).rstrip("s") for w in stand_id.split("_") if len(w) > 3]
 
     SPECIAL_MAPPINGS = {
@@ -83,34 +86,54 @@ def get_dual_images(stand_id, default_img):
     
     extra_keywords = SPECIAL_MAPPINGS.get(stand_id, [])
 
+    # ヒットしたファイルを収集
+    found_tarots = []
+    found_stands = []
+
     for f in files:
         f_lower = f.lower()
-        f_norm = normalize(f.split(".")[0])
-        
-        # ヒット判定
+        if not f_lower.endswith((".jpg", ".jpeg", ".png", ".webp")):
+            continue
+            
+        f_norm = normalize(f)
         is_hit = (stand_id_norm in f_norm) or any(w in f_norm for w in id_words) or any(kw in f_norm for kw in extra_keywords)
         
-        if is_hit and f_lower.endswith((".jpg", ".jpeg", ".png", ".webp")):
-            # 表（タロット面）の判定
+        if is_hit:
+            # 1. 表面（タロット面）候補
             if "ovatarot" in f_lower or "[tarot]" in f_lower:
-                tarot_img = f
-            # 裏（スタンド面）の判定
-            elif not "ovatarot" in f_lower:
-                # "THE " で始まるファイルが最初に見つかった場合は一旦タロットへ
-                if f_lower.startswith("the") and not tarot_img:
-                    tarot_img = f
-                else:
-                    stand_img = f
+                found_tarots.append(f)
+            # 2. 基本タロット候補 (THE...)
+            elif f_lower.startswith("the") and "tarot_back" not in f_lower:
+                found_tarots.append(f)
+            # 3. 裏面（スタンド面）候補
+            else:
+                found_stands.append(f)
 
-    # アップロード画像 (uploads) はウェブでも機能させる
+    # タロット面の決定 (OVATarotを最優先)
+    ova_tarots = [f for f in found_tarots if "ovatarot" in f.lower()]
+    if ova_tarots:
+        tarot_img = ova_tarots[0]
+    elif found_tarots:
+        tarot_img = found_tarots[0]
+
+    # スタンド面の決定 (PNGがあれば透過のために最優先)
+    png_stands = [f for f in found_stands if f.lower().endswith(".png")]
+    if png_stands:
+        stand_img = png_stands[0]
+    elif found_stands:
+        stand_img = found_stands[0]
+
+    # アップロード画像 (uploads) は常に最終決定より優先
     for ext in [".png", ".jpg", ".jpeg", ".webp"]:
         custom_path = os.path.join(UPLOAD_DIR, f"{stand_id}{ext}")
         if os.path.exists(custom_path):
             stand_img = custom_path
+            break # pngを見つけたら即終了
 
-    # 特例
+    # 特例 (kakyoin.png を優先)
     if stand_id == "hierophant_green":
-        if os.path.exists("kakyoin.jpg"): stand_img = "kakyoin.jpg"
+        if os.path.exists("kakyoin.png"): stand_img = "kakyoin.png"
+        elif os.path.exists("kakyoin.jpg"): stand_img = "kakyoin.jpg"
     
     return tarot_img, stand_img
 

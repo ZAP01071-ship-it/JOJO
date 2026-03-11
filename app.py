@@ -81,7 +81,10 @@ def get_dual_images(stand_id, default_img):
         "yellow_temperance": ["temperance"],
         "emperor": ["emperor"],
         "empress": ["empress"],
-        "sun": ["sun"]
+        "sun": ["sun"],
+        "thoth": ["tohth"],
+        "geb": ["geb"],
+        "khnum": ["khnum"]
     }
     
     extra_keywords = SPECIAL_MAPPINGS.get(stand_id, [])

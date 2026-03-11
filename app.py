@@ -65,7 +65,7 @@ def get_dual_images(stand_id, default_img):
         "death_thirteen": ["death13", "death"],
         "dark_blue_moon": ["darkbruemoon", "darkblue", "moon"],
         "ebony_devil": ["ebonydevil", "devil", "ebony"],
-        "silver_chariots": ["chariot", "silva"],
+        "silver_chariots": ["chariot", "silverchariot", "silva"],
         "hierophant_green": ["hierophant", "kakyoin"],
         "star_platinum": ["star", "ster", "platinam"],
         "hermit_purple": ["hermit", "harmit", "parple"],

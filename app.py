@@ -64,7 +64,7 @@ def get_dual_images(stand_id, default_img):
     SPECIAL_MAPPINGS = {
         "death_thirteen": ["death13", "death"],
         "dark_blue_moon": ["darkbruemoon", "darkblue", "moon"],
-        "ebony_devil": ["ebonydevil", "devil"],
+        "ebony_devil": ["ebonydevil", "devil", "ebony"],
         "silver_chariots": ["chariot", "silva"],
         "hierophant_green": ["hierophant", "kakyoin"],
         "star_platinum": ["star", "ster", "platinam"],
@@ -82,7 +82,7 @@ def get_dual_images(stand_id, default_img):
         "emperor": ["emperor"],
         "empress": ["empress"],
         "sun": ["sun"],
-        "thoth": ["tohth"],
+        "thoth": ["tohth", "thoth"],
         "geb": ["geb"],
         "khnum": ["khnum"]
     }
@@ -99,7 +99,13 @@ def get_dual_images(stand_id, default_img):
             continue
             
         f_norm = normalize(f)
-        is_hit = (stand_id_norm in f_norm) or any(w in f_norm for w in id_words) or any(kw in f_norm for kw in extra_keywords)
+        
+        # IDマッチ、単語マッチ、または特殊キーワードマッチ
+        has_id = (stand_id_norm in f_norm)
+        has_word = any(w in f_norm for w in id_words)
+        has_extra = any(normalize(kw) in f_norm for kw in extra_keywords)
+        
+        is_hit = has_id or has_word or has_extra
         
         if is_hit:
             # 1. 表面（タロット面）候補
